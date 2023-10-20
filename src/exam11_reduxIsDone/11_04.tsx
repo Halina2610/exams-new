@@ -11,6 +11,7 @@ const store = createStore(combineReducers({
 //store.ххх(() => {
 store.subscribe(() => {
 
+
         console.log('state changed')
     })
 
