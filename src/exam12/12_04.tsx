@@ -5,11 +5,18 @@ export const TempManager = () => {
     const [temp, setTemp] = useState(0)
     const [seconds, setSeconds] = useState(0)
 
+    //const resetTemp = () => setTemp(0)
     const resetTemp = useCallback(() => setTemp(0), []);
-    const increaseSeconds = () => setSeconds(seconds + 100)
 
+  const increaseSeconds = () => setSeconds(seconds + 100)
+
+    /*  const [message, setMessage] = useState('')
+    const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setMessage(event.currentTarget.value);
+    };*/
     return (
         <>
+           {/* <input onChange={onChangeHandler}/>*/}
             <TempDisplay temp={temp} reset={resetTemp}/>
             <div>
                 <p><b>Секунды:</b> {seconds} с</p>
