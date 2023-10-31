@@ -6,7 +6,7 @@ export const TempManager = () => {
     const [seconds, setSeconds] = useState(0)
 
     //const resetTemp = () => setTemp(0)
-    const resetTemp = useCallback(() => setTemp(0), []);
+    const resetTemp = useCallback(() => setTemp(0), []); //верно
 
   const increaseSeconds = () => setSeconds(seconds + 100)
 

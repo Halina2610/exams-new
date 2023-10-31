@@ -20,7 +20,9 @@ export const App = ({isAdmin}: { isAdmin: boolean }) => {
 
     const correctButtons = useMemo(() => {
         return buttons.filter(b => isAdmin ? true : !b.forAdminOnly)
-    }, [isAdmin])
+    }, [isAdmin])  //верно
+
+
    /* const correctButtons = XXX(() => {
         return buttons.filter(b => isAdmin ? true : !b.forAdminOnly)
     }, [YYY])*/
