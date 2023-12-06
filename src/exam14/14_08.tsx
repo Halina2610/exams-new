@@ -13,8 +13,7 @@ const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incub
 
 const api = {
     getUsers(pageNumber: number) {
-       // return instance.get(`users?pageSize=${3}&pageNumber${pageNumber}`)
-        return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`)
+        return instance.get(`users?pageSize=${3}&pageNumber${pageNumber}`)
     },
 }
 
@@ -77,4 +76,4 @@ root.render(<App/>)
 // Однако в коде допущена ошибка и всегда подгружаются одни и теже пользователи.
 // Задача: найти эту ошибку, и исправленную версию строки написать в качестве ответа.
 
-// 🖥 Пример ответа: const [currentPage, setCurrentPage] = useState(page) Ответ: return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`)
+// 🖥 Пример ответа: const [currentPage, setCurrentPage] = useState(page)
