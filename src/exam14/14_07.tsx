@@ -25,7 +25,8 @@ const photosAPI = {
         return instance.get<PhotoType>(`photos/${photoId}`)
     },
     updatePhoto(payload: PayloadType) {
-        return instance.put<PhotoType>(`photos/${photoId}`, {payload})
+        //return instance.put<PhotoType>(`photos/${photoId}`, {payload})
+        return instance.put<PhotoType>(`photos/${photoId}`, payload)
     }
 }
 
@@ -48,7 +49,6 @@ export const App = () => {
             title: 'Новый title',
             url: 'data:image/png;base64,iVBORw0FAKEADDRESSnwMZAABJRUrkJggg=='
         }
-      //  photosAPI.updatePhoto(payload)
         photosAPI.updatePhoto(payload)
             .then((res) => {
                 setPhoto(res.data)
@@ -83,4 +83,4 @@ root.render(<App/>)
 // Найдите и исправьте ошибку
 // Исправленную версию строки напишите в качестве ответа.
 
-// 🖥 Пример ответа: photosAPI.updatePhotoTitle(id, title)  не верно: photosAPI.updatePhoto({ title: payload.title })
+// 🖥 Пример ответа: photosAPI.updatePhotoTitle(id, title) верно: return instance.put<PhotoType>(`photos/${photoId}`, payload)

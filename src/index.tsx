@@ -1,80 +1,123 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import ReactDOM from 'react-dom/client'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 
-type UserType = {
+// TYPES
+type ProductType = {
     id: string;
-    name: string;
-    age: number;
-}
+    title: string;
+    description: string;
+    price: number;
+};
+
+type FilmType = {
+    id: number;
+    nameOriginal: string;
+    description: string;
+    ratingImdb: number;
+};
+
+type CommonResponseType<T> = {
+    total: number;
+    messages: string[];
+    page: number;
+    pageCount: number;
+    data: T[];
+};
 
 // API
-const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
+const instance = axios.create({ baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/' });
 
 const api = {
-    getUsers(pageNumber: number) {
-       // return instance.get(`users?pageSize=${3}&pageNumber${pageNumber}`)
-        return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`)
+    getProducts() {
+        return instance.get<CommonResponseType<ProductType>>('products');
     },
-}
+    getFilms() {
+        return instance.get<CommonResponseType<FilmType>>('films');
+    },
+};
 
 // App
-const buttons = [
-    {id: 1, title: '1'},
-    {id: 2, title: '2'},
-    {id: 3, title: '3'},
-]
-
-export const App = () => {
-
-    const [users, setUsers] = useState<UserType[]>([])
-    const [currentPage, setCurrentPage] = useState(1)
-
-    useEffect(() => {
-        api.getUsers(currentPage)
-            .then((res: any) => {
-                setUsers(res.data.items)
-            })
-    }, [currentPage])
-
-    const setPageHandler = (page: number) => {
-        setCurrentPage(page)
-    };
-
+const App = () => {
     return (
         <>
-            <h1>👪 Список пользователей</h1>
-            {
-                users.map(u => {
-                    return <div style={{marginBottom: '25px'}} key={u.id}>
-                        <p><b>name</b>: {u.name}</p>
-                        <p><b>age</b>: {u.age}</p>
-                    </div>
-                })
-            }
-
-            {
-                buttons.map(b => {
-                    return (
-                        <button key={b.id}
-                                style={b.id === currentPage ? {backgroundColor: 'lightblue'} : {}}
-                                onClick={() => setPageHandler(b.id)}>
-                            {b.title}
-                        </button>
-                    )
-                })
-            }
+            <h1>🛒 Products && 🎦 Films</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                <Products />
+                <Films />
+            </div>
         </>
-    )
-}
+    );
+};
 
+const Products = () => {
+    const [products, setProducts] = useState<ProductType[]>([]);
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(<App/>)
+    useEffect(() => {
+        api.getProducts().then((res) => setProducts(res.data.data));
+    }, []);
+
+    return (
+        <div style={{ width: '45%' }}>
+            <h2>🛒 Products</h2>
+            <div>
+                {products.map((p) => {
+                    return (
+                        <div key={p.id}>
+                            <b>{p.title}</b>
+                            <p>{p.description}</p>
+                            <p>💵 {p.price} $</p>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+const Films = () => {
+    const [films, setFilms] = useState<FilmType[]>([]);
+
+    useEffect(() => {
+        api.getFilms().then((res) => setFilms(res.data.data));
+    }, []);
+
+    return (
+        <div style={{ width: '45%' }}>
+            <h2>🎦 Films</h2>
+            <div>
+                {films.map((f) => {
+                    return (
+                        <div key={f.id}>
+                            <b>{f.nameOriginal}</b>
+                            <p>{f.description}</p>
+                            <p>⭐ {f.ratingImdb} </p>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+const root = document.getElementById('root');
+ReactDOM.render(<App />, root);
 
 // 📜 Описание:
-// При переходе по страницам должны подгружаться новые пользователи.
-// Однако в коде допущена ошибка и всегда подгружаются одни и теже пользователи.
-// Задача: найти эту ошибку, и исправленную версию строки написать в качестве ответа.
-
-// 🖥 Пример ответа: const [currentPage, setCurrentPage] = useState(page) Ответ: return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`)
+// При запуске проекта на экране вы увидите 2 списка: Products и Films.
+// С ними все хорошо, но обратите внимание на типизацию ответов с сервера ProductsResponseType и FilmsResponseType.
+// Дублирование типов на лицо.
+// Ваша задача написать дженериковый тип CommonResponseType и заменить им дублирующие типы.
+// Очередность свойств в типах менять запрещено (по причине что нам будет тяжело перебрать все правильные варианты :) )
+// Параметр тип назовите буквой T
+//
+// В качестве ответа нужно скопировать полностью рабочий дженериковый тип CommonResponseType
+//
+// 🖥 Пример ответа:
+// type CommonResponseType = {
+//   total: T
+//   messages: T[]
+//   page: T
+//   pageCount: T
+//   data: T[]
+// }
