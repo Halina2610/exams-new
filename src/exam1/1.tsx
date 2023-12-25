@@ -18,9 +18,9 @@ export const VideoDescription = (props: {videoDescription: string}) => {
 
 export const YoutubeVideo = (props: any) => {
     return <div>
-        <VideoHeader xxx />
-        <VideoContent yyy />
-        <VideoDescription zzz />
+        <VideoHeader videoName={''}  />
+        <VideoContent   videoContent={''} />
+        <VideoDescription videoDescription={''} />
     </div>
 }
 
