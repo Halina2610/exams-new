@@ -31,10 +31,10 @@ const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incu
 
 const api = {
     getTodos() {
-        return instance.get<TodoType[]>("todos");
+        return instance.get<TodoType[]>("todo");
     },
     getUsers() {
-        return instance.get<UsersResponseType>("users");
+        return instance.get<UsersResponseType>("user");
     },
 };
 
@@ -75,8 +75,8 @@ type ActionsType =
     | ReturnType<typeof setError>;
 
 // Utils functions
-function baseSuccessHandler<T>(dispatch: Dispatch, actionCreator: Function, data: T) {
-    dispatch(actionCreator(data));
+function baseErrorHandler(dispatch: Dispatch, message: string) {
+    dispatch(setError(message));
     dispatch(setLoadingAC(false));
 }
 
@@ -86,12 +86,11 @@ const getTodosTC = (): AppThunk => (dispatch) => {
     api
         .getTodos()
         .then((res) => {
-            // ❗❗❗ XXX ❗❗❗
-            baseSuccessHandler(dispatch, getTodosAC, res.data);
+            dispatch(getTodosAC(res.data));
+            dispatch(setLoadingAC(false));
         })
         .catch((e: AxiosError) => {
-            dispatch(setError(e.message));
-            dispatch(setLoadingAC(false));
+            // ❗❗❗ XXX ❗❗❗
         });
 };
 
@@ -100,12 +99,11 @@ const getUsersTC = (): AppThunk => (dispatch) => {
     api
         .getUsers()
         .then((res) => {
-            // ❗❗❗ YYY ❗❗❗
-            baseSuccessHandler(dispatch, getUsersAC, res.data.items);
+            dispatch(getUsersAC(res.data.items));
+            dispatch(setLoadingAC(false));
         })
         .catch((e: AxiosError) => {
-            dispatch(setError(e.message));
-            dispatch(setLoadingAC(false));
+            baseErrorHandler( dispatch, e.message) //верно
         });
 };
 
@@ -203,11 +201,11 @@ root.render(
 
 // 📜 Описание:
 // Перед вами список тудулистов и пользователей, которые находятся в постоянной загрузке.
-// Откройте network и вы увидите что запросы на сервер уходят и возвращаются с хорошими данными,
-// но вместо этого пользователь видит на экране Loader.
-// Для обработки успешного результата написана утилитная функция baseSuccessHandler.
-// Ваша задача воспользоваться этой функцией отобразить Todos и Users
-// Что нужно написать вместо XXX и YYY, чтобы реализовать данную задачу?
-// Ответ дайте через пробел.
+// Откройте network и вы увидите что запросы падают с ошибками,
+// но в коде этот никак не обрабатывается.
+// Для обработки ошибок написана утилитная функция baseErrorHandler.
+// Ваша задача воспользоваться этой функцией и вывести ошибки на экран.
+// Что нужно написать вместо XXX, чтобы ошибки обработались и пользователь их увидел ?
+//❗ Код фиксить не нужно.
 
-// 🖥 Пример ответа: dispatch(baseSuccessHandler(1,2,3))  dispatch(baseSuccessHandler(3,2,1)
+// 🖥 Пример ответа: dispatch(setLoadingAC(false))
