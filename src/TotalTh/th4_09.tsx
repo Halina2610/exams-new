@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom/client";
+import { useFormik } from "formik";
+import React from "react";
 import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
 // Types
-type NullableType<T> = null | T;
-
 type LoginFieldsType = {
     email: string;
     password: string;
@@ -25,7 +25,7 @@ const api = {
 // Reducer
 const initState = {
     isLoading: false,
-    error: null as NullableType<string>,
+    error: null as string | null,
     isLoggedIn: false,
 };
 
@@ -66,10 +66,13 @@ const loginTC =
                     alert("Вы залогинились успешно");
                 })
                 .catch((e) => {
-                    dispatch(setError(e.response.data.message)) // ne verno
+                    dispatch(setError(e.response.data.errors));
                 })
                 .finally(() => {
                     dispatch(setLoadingAC(false));
+                    setTimeout(() => {
+                        dispatch(setError(null));
+                    }, 3000);
                 });
         };
 
@@ -90,70 +93,82 @@ export const Loader = () => {
     return <h1>Loading ...</h1>;
 };
 
-// App
-export const App = () => {
-    const dispatch = useAppDispatch();
+// Profile
+export const Profile = () => {
+    return <h2>😎 Profile</h2>;
+};
 
-    const [form, setForm] = useState<LoginFieldsType>({ email: "", password: "" });
+// Login
+export const Login = () => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     const error = useAppSelector((state) => state.app.error);
     const isLoading = useAppSelector((state) => state.app.isLoading);
+    const isLoggedIn = useAppSelector((state) => state.app.isLoggedIn);
 
-    const changeFormValuesHandler = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
-        if (field === "email") {
-            setForm({ ...form, email: e.currentTarget.value });
-        }
-        if (field === "password") {
-            setForm({ ...form, password: e.currentTarget.value });
-        }
-    };
+    const formik = useFormik({
+        initialValues: {
+            email: "darrell@gmail.com",
+            password: "123",
+        },
+        onSubmit: (values) => {
+            dispatch(loginTC(values));
+        },
+    });
 
-    const submitForm = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        dispatch(loginTC(form));
-    };
+    if (isLoggedIn) {
+        navigate("/profile");
+    }
+
 
     return (
         <div>
             {!!error && <h2 style={{ color: "red" }}>{error}</h2>}
             {isLoading && <Loader />}
-            <form>
+            <form onSubmit={formik.handleSubmit}>
                 <div>
-                    <input
-                        placeholder={"Введите email"}
-                        value={form.email}
-                        onChange={(e) => changeFormValuesHandler(e, "email")}
-                    />
+                    <input placeholder={"Введите email"} {...formik.getFieldProps("email")} />
                 </div>
                 <div>
                     <input
                         type={"password"}
                         placeholder={"Введите пароль"}
-                        value={form.password}
-                        onChange={(e) => changeFormValuesHandler(e, "password")}
+                        {...formik.getFieldProps("password")}
                     />
                 </div>
-                <button type="submit" onClick={submitForm}>
-                    Залогиниться
-                </button>
+                <button type="submit">Залогиниться</button>
             </form>
         </div>
+    );
+};
+
+// App
+export const App = () => {
+
+    return (
+        <Routes>
+            <Route path={""} element={<Login />} />
+            <Route path={"profile"} element={<Profile />} />
+        </Routes>
     );
 };
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
     <Provider store={store}>
-        <App />
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
     </Provider>,
 );
 
 // 📜 Описание:
-// Перед вами форма логинизации. Введите любые логин и пароль и попробуйте залогиниться.
-// У вас это навряд ли получится 😈, т.к. вы не знаете email и пароль.
-// Откройте Network и проанализируйте запрос.
-// Задача: вывести сообщение об ошибке, которую возвращает сервера говорящую о том что email или password некорректны.
+// ❗ Email и password менять не надо. Это просто тестовые данные с которыми будет происходить успешный запрос.
+// Нажмите на кнопку "Залогиниться" и вы увидели alert с успешным сообщением
+// Задача: при успешной логинизации, редиректнуть пользователя на страницу Profile.
 
-// В качестве ответа указать строку коду, которая позволит это осуществить.
-// 🖥 Пример ответа: dispatch('Error message')
-// ❗ Типизировать ошибку не надо, т.к. там есть много нюансов, о которых вы узнаете позже
+// Напишите правильную строку кода
+// 🖥 Пример ответа:  console.log('If login => redirect to profile') ответ if (isLoggedIn) {
+//         navigate("/profile");
+//     }

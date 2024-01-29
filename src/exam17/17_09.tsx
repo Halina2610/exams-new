@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import axios from "axios";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import {Console} from "inspector";
 
 // Utils
 console.log = () => {};
