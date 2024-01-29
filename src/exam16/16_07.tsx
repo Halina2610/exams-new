@@ -65,10 +65,8 @@ const loginTC =
                     dispatch(setIsLoggedIn(true));
                     alert("Вы залогинились успешно");
                 })
-                //ответ не верен ❗❗❗
-                .catch((error) => {
-                    const errorMessage = error.response?.data?.message;
-                    dispatch(setError(errorMessage))
+                .catch((e) => {
+                    dispatch(setError(e.message)) // не верно
                 })
                 .finally(() => {
                     dispatch(setLoadingAC(false));

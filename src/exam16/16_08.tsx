@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { ThunkAction, ThunkDispatch } from "redux-thunk";
+import {thunk, ThunkAction, ThunkDispatch} from "redux-thunk";
 import axios, { AxiosError } from "axios";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
+
 
 // Types
 type CommentType = {
@@ -15,12 +16,11 @@ type CommentType = {
 };
 
 // Api
-const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/" });
-// не получилось достать коменты с апи
+const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/", withCredentials: true });
 
 const commentsAPI = {
     getComments() {
-        return instance.get<CommentType[]>("comment");
+        return instance.get<CommentType[]>(`comment`);
     },
 };
 
@@ -62,7 +62,8 @@ const rootReducer = combineReducers({
     app: appReducer,
 });
 
-const store = configureStore({ reducer: rootReducer });
+const store = configureStore({ reducer: rootReducer, middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk) });
+
 type RootState = ReturnType<typeof store.getState>;
 type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>;
 type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>;
@@ -110,3 +111,5 @@ root.render(
 // В качестве ответа указать исправленную строку коду
 
 // 🖥 Пример ответа: const store = createStore(rootReducer, applyMiddleware(thunk))
+//const store = configureStore({ reducer: rootReducer, middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk) });
+//не верно

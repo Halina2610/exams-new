@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {Provider, TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
+import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import {ThunkAction, ThunkDispatch} from "redux-thunk";
-import {configureStore, combineReducers} from "@reduxjs/toolkit";
+import { ThunkAction, ThunkDispatch } from "redux-thunk";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
 // Types
 type PhotoType = {
@@ -14,7 +14,7 @@ type PhotoType = {
 };
 
 // Api
-const instance = axios.create({baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/"});
+const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/" });
 
 const photosAPI = {
     getPhotos() {
@@ -33,25 +33,25 @@ type InitStateType = typeof initState;
 const photoReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
     switch (action.type) {
         case "PHOTO/GET-PHOTOS":
-            return {...state, photos: action.photos};
+            return { ...state, photos: action.photos };
         case "PHOTO/IS-LOADING":
-            return {...state, isLoading: action.isLoading};
+            return { ...state, isLoading: action.isLoading };
         default:
             return state;
     }
 };
 
-const getPhotosAC = (photos: PhotoType[]) => ({type: "PHOTO/GET-PHOTOS", photos}) as const;
-const setLoadingAC = (isLoading: boolean) => ({type: "PHOTO/IS-LOADING", isLoading}) as const;
+const getPhotosAC = (photos: PhotoType[]) => ({ type: "PHOTO/GET-PHOTOS", photos }) as const;
+const setLoadingAC = (isLoading: boolean) => ({ type: "PHOTO/IS-LOADING", isLoading }) as const;
 type ActionsType = ReturnType<typeof getPhotosAC> | ReturnType<typeof setLoadingAC>;
 
 const getPhotosTC = (): AppThunk => (dispatch) => {
     dispatch(setLoadingAC(true));
-    photosAPI.getPhotos()
-        .then((res) => {
-            dispatch(getPhotosAC(res.data))
-            dispatch(setLoadingAC(false))
-        });
+    photosAPI.getPhotos().then((res) => {
+        dispatch(getPhotosAC(res.data));
+        dispatch(setLoadingAC(false)); //верный ответ ❌
+
+    });
 };
 
 // Store
@@ -59,7 +59,7 @@ const rootReducer = combineReducers({
     photo: photoReducer,
 });
 
-const store = configureStore({reducer: rootReducer});
+const store = configureStore({ reducer: rootReducer });
 type RootState = ReturnType<typeof store.getState>;
 type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>;
 type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>;
@@ -85,14 +85,14 @@ const App = () => {
         <>
             <h1>📸 Фото</h1>
             <button onClick={getPhotosHandler}>Подгрузить фотографии</button>
-            {isLoading && <Loader/>}
-            <div style={{display: "flex", gap: "20px", margin: "20px"}}>
+            {isLoading && <Loader />}
+            <div style={{ display: "flex", gap: "20px", margin: "20px" }}>
                 {photos.map((p) => {
                     return (
                         <div key={p.id}>
                             <b>title</b>: {p.title}
                             <div>
-                                <img src={p.url} alt=""/>
+                                <img src={p.url} alt="" />
                             </div>
                         </div>
                     );
@@ -105,7 +105,7 @@ const App = () => {
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
     <Provider store={store}>
-        <App/>
+        <App />
     </Provider>,
 );
 

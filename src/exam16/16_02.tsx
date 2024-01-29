@@ -14,7 +14,7 @@ type PostType = {
 };
 
 // Api
-const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/ " });
+const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/a  pi/" });
 
 const postsAPI = {
     getPosts() {
@@ -54,7 +54,9 @@ const getPostsTC = (): AppThunk => (dispatch) => {
         .then((res) => {
             dispatch(getPostsAC(res.data));
         })
-        .catch((e: AxiosError) => {});
+        .catch((e: AxiosError) => {
+            dispatch(setErrorAC(e.message)); // верный ответ ❌
+        });
 };
 
 // Store
@@ -105,13 +107,5 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 root.render(
     <Provider store={store}>
         <App />
-    </Provider>,
+    </Provider>
 );
-
-// 📜 Описание:
-// ❌ Посты не подгрузились. Произошла какая-то ошибка.
-// Чинить приложение не нужно (если только для себя, в ответе это не учитывается).
-// Задача: вывести сообщение об ошибке на экран.
-// В качестве ответа указать строку коду, которая позволит это осуществить
-
-// 🖥 Пример ответа: const store = createStore(rootReducer, applyMiddleware(thunk)) <h2 style={{ color: "red" }}>{!!error && error}</h2> не верно

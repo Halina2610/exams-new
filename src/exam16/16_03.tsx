@@ -139,12 +139,9 @@ const App = () => {
                     return (
                         <div key={p.id}>
                             <b>title</b>: {p.title}
-                            <button style={{ marginLeft: "15px" }}
-                                    onClick={() => deletePostHandler(p.id)}
-                                    disabled={p.isDisabled}
-                            >
+                            <button style={{ marginLeft: "15px" }} onClick={() => deletePostHandler(p.id)} disabled={p.isDisabled}>
                                 удалить пост
-                            </button>
+                            </button> {/*//верно disabled={p.isDisabled}*/}
                         </div>
                     );
                 })}
@@ -174,4 +171,3 @@ root.render(
 // Необходимую строку кода для решения этой задачи напишите в качестве ответа.
 
 // 🖥 Пример ответа: style={{marginRight: '20px'}}
-// disabled={p.isDisabled}

@@ -1,115 +1,93 @@
-import React, { useEffect } from "react";
-import ReactDOM from "react-dom/client";
-import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import {thunk, ThunkAction, ThunkDispatch} from "redux-thunk";
-import axios, { AxiosError } from "axios";
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { useFormik } from 'formik';
+import React from 'react'
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 
-// Types
-type CommentType = {
-    postId: string;
-    id: string;
-    name: string;
-    email: string;
-    body: string;
-};
+// Main
+export const Login = () => {
 
-// Api
-const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/", withCredentials: true });
-
-const commentsAPI = {
-    getComments() {
-        return instance.get<CommentType[]>(`comment`);
-    },
-};
-
-// Reducer
-const initState = {
-    comments: [] as CommentType[],
-};
-
-type InitStateType = typeof initState;
-
-const appReducer = (state: InitStateType = initState, action: ActionsType) => {
-    switch (action.type) {
-        case "COMMENTS/GET-COMMENTS":
-            return { ...state, comments: action.comments };
-
-        default:
-            return state;
-    }
-};
-
-const getCommentsAC = (comments: CommentType[]) =>
-    ({ type: "COMMENTS/GET-COMMENTS", comments }) as const;
-type ActionsType = ReturnType<typeof getCommentsAC>;
-
-// Thunk
-const getCommentsTC = (): AppThunk => (dispatch) => {
-    commentsAPI
-        .getComments()
-        .then((res) => {
-            dispatch(getCommentsAC(res.data));
-        })
-        .catch((e: AxiosError) => {
-            alert(`Сообщение об ошибке: ${e.message}`);
-        });
-};
-
-// Store
-const rootReducer = combineReducers({
-    app: appReducer,
-});
-
-const store = configureStore({ reducer: rootReducer, middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk) });
-
-type RootState = ReturnType<typeof store.getState>;
-type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>;
-type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>;
-const useAppDispatch = () => useDispatch<AppDispatch>();
-const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
-// Components
-export const App = () => {
-    const comments = useAppSelector((state) => state.app.comments);
-    const dispatch = useAppDispatch();
-
-    useEffect(() => {
-        dispatch(getCommentsTC());
-    }, []);
+    const formik = useFormik({
+        initialValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: '',
+            phone: '',
+        },
+        onSubmit: values => {
+            alert(JSON.stringify(values, null, 2));
+        },
+    });
 
     return (
-        <>
-            <h1>📝 Список комментариев</h1>
-            {comments.length ? (
-                comments.map((c) => {
-                    return (
-                        <div key={c.id}>
-                            <b>Comment</b>: {c.body}{" "}
-                        </div>
-                    );
-                })
-            ) : (
-                <h3>❌ Комментарии не подгрузились. Произошла какая-то ошибка. Найди и исправь ее</h3>
-            )}
-        </>
+        <form onSubmit={formik.handleSubmit}>
+            <div>
+                <input
+                    name="firstName"
+                    onChange={formik.handleChange}
+                    value={formik.values.firstName}
+                    placeholder={'Введите имя'}
+                />
+            </div>
+            <div>
+                <input
+                    name="lastName"
+                    onChange={formik.handleChange}
+                    value={formik.values.lastName}
+                    placeholder={'Введите фамилию'}
+                />
+            </div>
+            <div>
+                <input
+                    name="email"
+                    onChange={formik.handleChange}
+                    value={formik.values.email}
+                    placeholder={'Введите email'}
+                />
+            </div>
+            <div>
+                <input
+                    name="password"
+                    onChange={formik.handleChange}
+                    value={formik.values.password}
+                    placeholder={'Введите пароль'}
+                    type={'password'}
+                />
+            </div>
+            <div>
+                <input
+                    name="phone"
+                    onChange={formik.handleChange}
+                    value={formik.values.phone}
+                    placeholder={'Введите телефон'}
+                />
+            </div>
+            <button type="submit">Отправить</button>
+        </form>
     );
-};
+}
 
-const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
-root.render(
-    <Provider store={store}>
-        <App />
-    </Provider>,
-);
+// App
+export const App = () => {
+    return (
+        <Routes>
+            <Route path={''} element={<Login/>}/>
+        </Routes>
+    )
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(<BrowserRouter><App/></BrowserRouter>)
 
 // 📜 Описание:
-// ❌ Комментарии не подгрузились. Произошла какая-то ошибка.
-// В данном задании вам нужно найти ошибку и починить приложение.
-// Если сделаете все верно, то увидите комментарии.
-// В качестве ответа указать исправленную строку коду
+// Форма заполнения данных работает некорректно.
+// Пользователи жалуются на поле ввода "Телефона"
+// Найдите в коде ошибку. Исправленную версию строки напишите в качестве ответа.
 
-// 🖥 Пример ответа: const store = createStore(rootReducer, applyMiddleware(thunk))
-//const store = configureStore({ reducer: rootReducer, middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk) });
-//не верно
+// 🖥 Пример ответа: <form onSubmit={formik.handleSubmit}> не верно <input
+//   name="phone"
+//   onChange={formik.handleChange}
+//   value={formik.values.phone}
+//   placeholder={'Введите телефон'}
+// />

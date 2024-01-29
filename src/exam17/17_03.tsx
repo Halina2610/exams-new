@@ -1,119 +1,74 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { ThunkAction, ThunkDispatch } from "redux-thunk";
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { useFormik } from 'formik';
+import React from 'react'
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
 
 // Types
-type PhotoType = {
-    albumId: string;
-    id: string;
-    title: string;
-    url: string;
-};
+type LoginFieldsType = {
+    firstName: string
+    email: string
+}
 
-// Api
-const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/" });
+// Main
+export const Login = () => {
 
-const photosAPI = {
-    getPhotos() {
-        return instance.get<PhotoType[]>("photos?delay=2");
-    },
-};
+    const formik = useFormik({
+        initialValues: {
+            firstName: '',
+            email: '',
+        },
+        validate: (values) => {
+            const errors: Partial<LoginFieldsType> = {};
 
-// Reducer
-const initState = {
-    isLoading: false,
-    photos: [] as PhotoType[],
-};
-
-type InitStateType = typeof initState;
-
-const photoReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
-    switch (action.type) {
-        case "PHOTO/GET-PHOTOS":
-            return { ...state, photos: action.photos };
-        case "PHOTO/IS-LOADING":
-            return { ...state, isLoading: action.isLoading };
-        default:
-            return state;
-    }
-};
-
-const getPhotosAC = (photos: PhotoType[]) => ({ type: "PHOTO/GET-PHOTOS", photos }) as const;
-const setLoadingAC = (isLoading: boolean) => ({ type: "PHOTO/IS-LOADING", isLoading }) as const;
-type ActionsType = ReturnType<typeof getPhotosAC> | ReturnType<typeof setLoadingAC>;
-
-const getPhotosTC = (): AppThunk => (dispatch) => {
-    dispatch(setLoadingAC(true));
-    photosAPI.getPhotos().then((res) => {
-        dispatch(getPhotosAC(res.data));
-        dispatch(setLoadingAC(false)); //верный ответ ❌
-
+            if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+                errors.email = 'Invalid email address';
+            }
+            return errors
+        },
+        onSubmit: values => {
+            alert(JSON.stringify(values, null, 2));
+        }
     });
-};
 
-// Store
-const rootReducer = combineReducers({
-    photo: photoReducer,
-});
-
-const store = configureStore({ reducer: rootReducer });
-type RootState = ReturnType<typeof store.getState>;
-type AppDispatch = ThunkDispatch<RootState, unknown, ActionsType>;
-type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, ActionsType>;
-const useAppDispatch = () => useDispatch<AppDispatch>();
-const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
-// Loader
-export const Loader = () => {
-    return <h1>Loading ...</h1>;
-};
-
-// App
-const App = () => {
-    const dispatch = useAppDispatch();
-    const photos = useAppSelector((state) => state.photo.photos);
-    const isLoading = useAppSelector((state) => state.photo.isLoading);
-
-    const getPhotosHandler = () => {
-        dispatch(getPhotosTC());
-    };
+    // Функция необходима для того, чтобы вебшторм не ругался на true в JSX
+    const getTrue = () => {
+        return true
+    }
 
     return (
-        <>
-            <h1>📸 Фото</h1>
-            <button onClick={getPhotosHandler}>Подгрузить фотографии</button>
-            {isLoading && <Loader />}
-            <div style={{ display: "flex", gap: "20px", margin: "20px" }}>
-                {photos.map((p) => {
-                    return (
-                        <div key={p.id}>
-                            <b>title</b>: {p.title}
-                            <div>
-                                <img src={p.url} alt="" />
-                            </div>
-                        </div>
-                    );
-                })}
+        <form onSubmit={formik.handleSubmit}>
+            <div>
+                <input placeholder={'Введите имя'} {...formik.getFieldProps('firstName')}/>
             </div>
-        </>
+            <div>
+                <input placeholder={'Введите email'}{...formik.getFieldProps('email')}/>
+                {formik.touched.email && formik.errors.email && <div style={{ color: 'red' }}>{formik.errors.email}</div>}
+            </div>
+            <button type="submit">Отправить</button>
+        </form>
     );
-};
+}
 
-const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
-root.render(
-    <Provider store={store}>
-        <App />
-    </Provider>,
-);
+// App
+export const App = () => {
+    return (
+        <Routes>
+            <Route path={''} element={<Login/>}/>
+        </Routes>
+    )
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(<BrowserRouter><App/></BrowserRouter>)
 
 // 📜 Описание:
-// При нажатии на кнопку "Подгрузить фотографии" вы должны увидеть Loading...,
-// и через 3 секунды непосредственно фотографии.
-// Но после подгрузки данных Loader не убирается.
-// Какой код нужно написать, чтобы Loader перестал отображаться после получения данных
-// В качестве ответа напишите строку кода.
+// Загрузив приложение вы увидите ошибку под полем email, но вы еще ничего не ввели.
+// Исправьте 46 строку кода так, чтобы:
+// 1) Сообщение об ошибке показывалось только в том случае, когда email введен некорректно.
+// 2) Вместо ERROR должен быть конкретный текст ошибки прописанный в валидации к этому полю.
+// 3) Сообщение должно показываться только в том случае, когда мы взаимодействовали с полем.
+// Исправленную версию строки напишите в качестве ответа.
 
-// 🖥 Пример ответа: console.log('stop Loader')
+// 🖥 Пример ответа: {true && <div style={{color: 'red'}}>error.email</div>} ответ верно {formik.touched.email && formik.errors.email && <div style={{ color: 'red' }}>{formik.errors.email}</div>}
+

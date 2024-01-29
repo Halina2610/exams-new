@@ -87,7 +87,7 @@ const getTodosTC = (): AppThunk => (dispatch) => {
         .getTodos()
         .then((res) => {
             // ❗❗❗ XXX ❗❗❗
-            dispatch(baseSuccessHandler(dispatch, getTodosAC, res.data) as unknown as ActionsType);
+            baseSuccessHandler(dispatch, getTodosAC, res.data); //верно
         })
         .catch((e: AxiosError) => {
             dispatch(setError(e.message));
@@ -95,14 +95,13 @@ const getTodosTC = (): AppThunk => (dispatch) => {
         });
 };
 
-
 const getUsersTC = (): AppThunk => (dispatch) => {
     dispatch(setLoadingAC(true));
     api
         .getUsers()
         .then((res) => {
             // ❗❗❗ YYY ❗❗❗
-            dispatch(baseSuccessHandler(dispatch, getUsersAC, res.data.items) as unknown as ActionsType);
+            baseSuccessHandler(dispatch, getUsersAC, res.data.items); //верно
         })
         .catch((e: AxiosError) => {
             dispatch(setError(e.message));
@@ -211,4 +210,4 @@ root.render(
 // Что нужно написать вместо XXX и YYY, чтобы реализовать данную задачу?
 // Ответ дайте через пробел.
 
-// 🖥 Пример ответа: dispatch(baseSuccessHandler(1,2,3))  dispatch(baseSuccessHandler(3,2,1) Ответ неверен dispatch(baseSuccessHandler(dispatch, getTodosAC, res.data) as unknown as ActionsType)
+// 🖥 Пример ответа: dispatch(baseSuccessHandler(1,2,3))  dispatch(baseSuccessHandler(3,2,1)

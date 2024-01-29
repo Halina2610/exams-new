@@ -57,16 +57,18 @@ const getPhotosTC = (): AppThunk => (dispatch) => {
     photosAPI
         .getPhotos()
         .then((res) => {
-            dispatch(getPhotosAC(res.data))
+            dispatch(getPhotosAC(res.data));
         })
         .catch((e: AxiosError) => {
-            dispatch(setError(e.message))
-        })
-        //ответ:
-        .finally(()=> {
-            dispatch(setLoadingAC(false))
-        })
+            dispatch(setError(e.message));
+        }).finally(()=>{
+        dispatch(setLoadingAC(false));
 
+    });
+    //верно .finally(()=>{
+    //         dispatch(setLoadingAC(false));
+    //
+    //     })
 };
 
 // Store
