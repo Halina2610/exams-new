@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
@@ -11,23 +11,25 @@ type UserType = {
     age: number;
 };
 
+type UsersResponseType = {
+    items: UserType[];
+    totalCount: number;
+};
+
 // API
 const instance = axios.create({ baseURL: "https://exams-frontend.kimitsu.it-incubator.ru/api/" });
 
 const api = {
-    getUsers(pageNumber: number) {
-        return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`);
+    getUsers(search: string) {
+        return instance.get<UsersResponseType>(`users?name=${search}&pageSize=100`);
     },
 };
 
-// Reducer
-const initState = { page: 1, users: [] as UserType[] };
+const initState = { users: [] as UserType[] };
 type InitStateType = typeof initState;
 
 const appReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
     switch (action.type) {
-        case "SET_PAGE":
-            return { ...state, page: action.page };
         case "SET_USERS":
             return { ...state, users: action.users };
         default:
@@ -45,48 +47,42 @@ type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, A
 const useAppDispatch = () => useDispatch<AppDispatch>();
 const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-const setPageAC = (page: number) => ({ type: "SET_PAGE", page }) as const;
 const setUsersAC = (users: UserType[]) => ({ type: "SET_USERS", users }) as const;
-type ActionsType = ReturnType<typeof setPageAC> | ReturnType<typeof setUsersAC>;
+type ActionsType = ReturnType<typeof setUsersAC>;
 
-const getUsers = (): AppThunk => (dispatch, getState) => {
-    /*const page = 1;*/
-    const page = getState().app.page;
-    api.getUsers(page).then((res) => dispatch(setUsersAC(res.data.items)));
-};
+// Thunk
+const getFriends =
+    (name: string): AppThunk =>
+        (dispatch) => {
+            api.getUsers(name).then((res) => dispatch(setUsersAC(res.data.items)));
+        };
 
-// Components
-export const App = () => {
-    const page = useAppSelector((state) => state.app.page);
+export const Users = () => {
     const users = useAppSelector((state) => state.app.users);
-
     const dispatch = useAppDispatch();
+    const [name, setName] = useState("");
+    const [timerId, setTimerId] = useState(0);
 
     useEffect(() => {
-        dispatch(getUsers());
-    }, [page]);
-
-    const pages = new Array(4).fill(1).map((p, i) => (
-        <button key={i} onClick={() => dispatch(setPageAC(i + 1))} disabled={page === i + 1}>
-            {i + 1}
-        </button>
-    ));
+        setTimerId(
+            +setTimeout(() => {
+                dispatch(getFriends(name));
+            }, 1500),
+        );
+    }, [name]);
 
     return (
         <div>
+            <input value={name} onChange={(e) => setName(e.target.value)} />
             {users.map((u) => {
                 return (
-                    <div style={{ marginBottom: "25px" }} key={u.id}>
+                    <div key={u.id}>
                         <p>
                             <b>name</b>: {u.name}
-                        </p>
-                        <p>
-                            <b>age</b>: {u.age}
                         </p>
                     </div>
                 );
             })}
-            {pages}
         </div>
     );
 };
@@ -94,13 +90,18 @@ export const App = () => {
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
     <Provider store={store}>
-        <App />
+        <Users />
     </Provider>,
 );
 
 // 📜 Описание:
-// При переходе по страницам должны подгружаться новые пользователи.
-// Однако в коде допущена ошибка и всегда подгружаются одни и теже пользователи.
-// Задача: найти эту ошибку, и исправленную версию строки написать в качестве ответа.
-
-// 🖥 Пример ответа: {pages.next()} ответ не верен getState().app.page
+// На экране input, куда можно вводить символы.
+// Откройте Network/ fetch/XHR и поробуйте вводить символы
+// Обратите внимание, что все символы которые вы вводите уходят на сервер -
+// это плохо.
+//
+// 🪛 Задача: Починить debounce
+// В качестве ответа напишите строку кода которую необходимо исправить или добавить
+// для реализации данной задачи
+//
+// 🖥 Пример ответа: value={name(1500)}  }, [dispatch] не верно
