@@ -13,8 +13,9 @@ const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incub
 
 const api = {
     getUsers() {
-        /*return instance.get('users?pageSize=3&pageNumber=2')*/
-        return instance.get('users=pageSize=3=pageNumber=2')
+
+        return instance.get(`users?pageSize=${3}&pageNumber=${2}`);
+
     },
 }
 
@@ -59,3 +60,7 @@ root.render(<App/>)
 
 
 // 🖥 Пример ответа: return instance.get('users=pageSize=3=pageNumber=2') не верно   return instance.get('users/pageSize=3/pageNumber=2')
+// return instance.get('users/pageSize/3/pageNumber/2') не верно
+//  return instance.get('users?pageSize=3&pageNumber=2') не верно
+
+//попробовать  return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`);

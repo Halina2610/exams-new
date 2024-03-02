@@ -69,11 +69,15 @@ export const Users = () => {
                 dispatch(getFriends(name));
             }, 1500),
         );
+        if (timerId) {
+            clearTimeout(timerId);
+        }
+
     }, [name]);
 
     return (
         <div>
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+            <input value={name} onChange={(e) => setName(e.target.value)}  />
             {users.map((u) => {
                 return (
                     <div key={u.id}>
@@ -104,4 +108,6 @@ root.render(
 // В качестве ответа напишите строку кода которую необходимо исправить или добавить
 // для реализации данной задачи
 //
-// 🖥 Пример ответа: value={name(1500)}  }, [dispatch] не верно
+// 🖥 Пример ответа: value={name(1500)}  }, [dispatch] не верно и это тоже не верно if (timerId) {
+//             clearTimeout(timerId);
+//         }

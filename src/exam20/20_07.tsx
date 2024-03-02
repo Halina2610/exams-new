@@ -175,3 +175,43 @@ root.render(
 //             sortBy,
 //             sortDirection: newSort,
 //         });
+
+// и это не верно    let newSortDirection: "asc" | "desc" = "asc";
+//
+//         if (activeColumn.sortBy === sortBy) {
+//             newSortDirection = activeColumn.sortDirection === "asc" ? "desc" : "asc";
+//         }
+//         const newActiveColumn: ParamsType = {
+//             sortBy,
+//             sortDirection: newSortDirection,
+//         };
+//
+//         setActiveColumn(newActiveColumn);
+//❗❗❗ XXX ❗❗❗
+//
+//        Можно попробовать  const sortHandler = (sortBy: string) => {
+//   // Проверяем, по какому столбцу нужно сортировать
+//   if (sortBy === 'name') {
+//     // Сортируем по имени
+//     const sortedUsers = [...users].sort((a, b) => a.name.localeCompare(b.name));
+//     // Если текущий столбец совпадает с активным столбцом, меняем направление сортировки
+//     if (activeColumn.sortBy === 'name') {
+//       sortedUsers.reverse();
+//     }
+//     // Обновляем состояние пользователей
+//     dispatch(setUsers(sortedUsers));
+//     // Обновляем активный столбец
+//     setActiveColumn({ sortBy: 'name', sortDirection: activeColumn.sortDirection === 'asc' ? 'desc' : 'asc' });
+//   } else if (sortBy === 'age') {
+//     // Сортируем по возрасту
+//     const sortedUsers = [...users].sort((a, b) => a.age - b.age);
+//     // Если текущий столбец совпадает с активным столбцом, меняем направление сортировки
+//     if (activeColumn.sortBy === 'age') {
+//       sortedUsers.reverse();
+//     }
+//     // Обновляем состояние пользователей
+//     dispatch(setUsers(sortedUsers));
+//     // Обновляем активный столбец
+//     setActiveColumn({ sortBy: 'age', sortDirection: activeColumn.sortDirection === 'asc' ? 'desc' : 'asc' });
+//   }
+// };
