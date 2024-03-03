@@ -214,4 +214,13 @@ root.render(
 //     // Обновляем активный столбец
 //     setActiveColumn({ sortBy: 'age', sortDirection: activeColumn.sortDirection === 'asc' ? 'desc' : 'asc' });
 //   }
-// };
+// };   не верно тоже setActiveColumn((prevActiveColumn) => {
+//             if (prevActiveColumn.sortBy === sortBy) {
+//                 const sortDirection = prevActiveColumn.sortDirection === 'asc' ? 'desc' : 'asc';
+//                 dispatch(getUsersTC({ sortBy, sortDirection }));
+//                 return { sortBy, sortDirection };
+//             } else {
+//                 dispatch(getUsersTC({ sortBy, sortDirection: 'asc' }));
+//                 return { sortBy, sortDirection: 'asc' };
+//             }
+//         });

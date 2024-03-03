@@ -11,11 +11,27 @@ type UserType = {
 // API
 const instance = axios.create({baseURL: 'https://exams-frontend.kimitsu.it-incubator.ru/api/'})
 
+/*
 const api = {
     getUsers() {
 
-        return instance.get(`users?pageSize=${3}&pageNumber=${2}`);
+        /!*instance.get(`users?pageSize=${3}&pageNumber=${2}`);*!/
+        return instance.get('users/pageSize/3/pageNumber/2')
 
+
+
+    },
+}
+*/
+
+const api = {
+    getUsers() {
+        return instance.get('users', {
+            params: {
+                pageSize: 3,
+                pageNumber: 2
+            }
+        });
     },
 }
 
@@ -64,3 +80,9 @@ root.render(<App/>)
 //  return instance.get('users?pageSize=3&pageNumber=2') не верно
 
 //попробовать  return instance.get(`users?pageSize=${3}&pageNumber=${pageNumber}`);
+//return instance.get('users', {
+//   params: {
+//      pageSize: 3,
+//pageNumber: 2
+//   }
+//});
