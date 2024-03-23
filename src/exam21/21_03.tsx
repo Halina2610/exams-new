@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { ThunkAction, ThunkDispatch } from "redux-thunk";
 import { Provider, TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
@@ -51,13 +51,21 @@ const api = {
 };
 
 // Reducer
-const initState = { users: [] as UserType[] };
+const initState = {
+    users: [] as UserType[],
+    params: {
+        sortBy: null,
+        sortDirection: "asc",
+    } as ParamsType,
+};
 type InitStateType = typeof initState;
 
 const appReducer = (state: InitStateType = initState, action: ActionsType): InitStateType => {
     switch (action.type) {
         case "SET_USERS":
             return { ...state, users: action.users };
+        case "SET_PARAMS":
+            return { ...state, params: { ...state.params, ...action.payload } };
         default:
             return state;
     }
@@ -74,42 +82,35 @@ const useAppDispatch = () => useDispatch<AppDispatch>();
 const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 const setUsersAC = (users: UserType[]) => ({ type: "SET_USERS", users }) as const;
-type ActionsType = ReturnType<typeof setUsersAC>;
+const setParamsAC = (payload: ParamsType) => ({ type: "SET_PARAMS", payload }) as const;
+type ActionsType = ReturnType<typeof setUsersAC> | ReturnType<typeof setParamsAC>;
 
 // Thunk
-const getUsersTC =
-    (searchParams?: ParamsType): AppThunk =>
-        (dispatch) => {
-            api.getUsers(searchParams).then((res) => dispatch(setUsersAC(res.data.items)));
-        };
+const getUsersTC = (): AppThunk => (dispatch, getState) => {
+    const params = getState().app.params;
+    api
+        .getUsers(params.sortBy ? params : undefined)
+        .then((res) => dispatch(setUsersAC(res.data.items)));
+};
 
 export const Users = () => {
-    const [activeColumn, setActiveColumn] = useState<ParamsType>({
-        sortBy: null,
-        sortDirection: "asc",
-    });
-
     const users = useAppSelector((state) => state.app.users);
+    const sortBy = useAppSelector((state) => state.app.params.sortBy);
+    const sortDirection = useAppSelector((state) => state.app.params.sortDirection);
+    console.log(users, sortBy, sortDirection);
 
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(activeColumn.sortBy ? getUsersTC(activeColumn) : getUsersTC());
-    }, [activeColumn]);
-
-    /*  const sortHandler = (sortBy: string) => {
-          // ❗❗❗ XXX ❗❗❗
-      };*/
-
-    const sortHandler = (sortBy: string) => {
-        let newSort: "asc" | "desc" = "asc";
-        if (activeColumn.sortBy === sortBy && activeColumn.sortDirection === "asc") {
-            newSort = "desc";
+        if (sortBy) {
+            dispatch(getUsersTC())
         }
-        setActiveColumn({
-            sortBy,
-            sortDirection: newSort,
-        });
+    }, [dispatch, sortBy])
+    // ❗❗❗ XXX ❗❗❗
+
+    const sortHandler = (name: string) => {
+        const direction = sortDirection === "asc" ? "desc" : "asc";
+        dispatch(setParamsAC({ sortBy: name, sortDirection: direction }));
     };
 
     return (
@@ -120,21 +121,9 @@ export const Users = () => {
                 <tr>
                     <th style={th} onClick={() => sortHandler("name")}>
                         Name
-                        {activeColumn?.sortBy === "name" &&
-                            (activeColumn.sortDirection === "asc" ? (
-                                <span> &#8593;</span>
-                            ) : (
-                                <span> &#8595;</span>
-                            ))}
                     </th>
                     <th style={th} onClick={() => sortHandler("age")}>
                         Age
-                        {activeColumn?.sortBy === "age" &&
-                            (activeColumn.sortDirection === "asc" ? (
-                                <span> &#8593;</span>
-                            ) : (
-                                <span> &#8595;</span>
-                            ))}
                     </th>
                 </tr>
                 </thead>
@@ -161,29 +150,14 @@ root.render(
 );
 
 // 📜 Описание:
-// Перед вами таблица с пользователями.
-// Ваша задача вместо XXX написать код для сортировки пользователей по имени и возрасту.
-// Т.е. при нажатии на name либо age пользователи должны сортироваться в таблице.
-// При повторном нажатии на этот же столбец сортировка должна происходить в обратном порядке
-// ❗ сортировка пользователей происходит на сервере, т.е. sort использовать не нужно
+// Перед вами таблица с пользователями. Но данные не подгружаются
+// Что нужно написать вместо XXX, чтобы:
+// 1) Пользователи подгрузились
+// 2) Чтобы работала сортировка по имени и возрасту
+// 3) Направление сортировки тоже должно работать (проверить можно нажав на одно и тоже поле 2 раза)
 
-// 🖥 Пример ответа: sort(a, b) не верно   let newSort: "asc" | "desc" = "asc";
-//         if (activeColumn.sortBy === sortBy && activeColumn.sortDirection === "asc") {
-//             newSort = "desc";
+// 🖥 Пример ответа: console.log(users, sortBy, sortDirection) не верно useEffect(() => {
+//         if (sortBy) {
+//             dispatch(getUsersTC())
 //         }
-//         setActiveColumn({
-//             sortBy,
-//             sortDirection: newSort,
-//         });
-
-
-// };   не верно тоже setActiveColumn((prevActiveColumn) => {
-//             if (prevActiveColumn.sortBy === sortBy) {
-//                 const sortDirection = prevActiveColumn.sortDirection === 'asc' ? 'desc' : 'asc';
-//                 dispatch(getUsersTC({ sortBy, sortDirection }));
-//                 return { sortBy, sortDirection };
-//             } else {
-//                 dispatch(getUsersTC({ sortBy, sortDirection: 'asc' }));
-//                 return { sortBy, sortDirection: 'asc' };
-//             }
-//         });
+//     }, [dispatch, sortBy])
